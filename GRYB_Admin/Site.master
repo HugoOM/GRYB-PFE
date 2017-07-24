@@ -53,6 +53,9 @@
                         <li><a runat="server" href="~/">Home</a></li>
                         <li><a runat="server" href="~/About">About</a></li>
                         <li><a runat="server" href="~/Contact">Contact</a></li>
+                        <li><a runat="server" href="~/marcmad/RoleManager.aspx">manage roles</a></li>
+                        <li><a runat="server" href="~/marcmad/UserManager.aspx">manage users</a></li>
+                        <li><a runat="server" href="~/marcmad/AddUser.aspx">add users</a></li>
                     </ul>
                     <asp:LoginView runat="server" ViewStateMode="Disabled">
                         <AnonymousTemplate>

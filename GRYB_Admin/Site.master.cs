@@ -66,6 +66,11 @@ public partial class SiteMaster : MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        // TODO change this
+      /*  if (HttpContext.Current.User.IsInRole("canEdit"))
+        {
+            memberPages.Visible = true;
+        }*/
 
     }
 
