@@ -11,61 +11,28 @@ using System.Web.UI.WebControls;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity.EntityFramework;
 using GRYB_Admin;
+using System.Web.Http;
 
+[Authorize(Roles = RolePermission.removeUser)]
 public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
 {
-    ApplicationGroupManager groupRoleManager;
-    UserManager<ApplicationUser> userManager;
-    ApplicationDbContext context;
-
-    //ApplicationUser selectedUser;
-    //IdentityRole previousUserRole;
 
     protected void Page_Load(object sender, EventArgs e)
     {
-       /* AddUserAndRole();
-        if (!IsPostBack)
-        {
-            updateRoleBox();
-        }*/
-        
-        context = new ApplicationDbContext();
-        // Create a RoleStore object by using the ApplicationDbContext object. 
-        // The RoleStore is only allowed to contain IdentityRole objects.
-        var roleStore = new RoleStore<IdentityRole>(context);
-
-        groupRoleManager = new ApplicationGroupManager();
-        userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
         hideAllActionMessages();
         if (!IsPostBack)
         {
-            refreshUserDDList();
+            ApplicationGroupManager groupRoleManager = new ApplicationGroupManager();
             List<ApplicationGroup> groupRoles = groupRoleManager.Groups.ToList().OrderBy(x => x.Name).ToList();
+            refreshUserDDList(new ApplicationDbContext());
             ApplicationUtilities.updateListControl(roleDDL, groupRoles, "Id", "Name");
-          //  roleDDL.DataSource = groupRoleManager.Roles.ToList().Select(x => x.Name);
-           // roleDDL.DataBind();
         }
     }
-    private void refreshUserDDList()
+    private void refreshUserDDList(ApplicationDbContext context)
     {
-
-       /* roleGroupList.Items.Clear();
-        List<ApplicationGroup> groups = groupMgr.Groups.ToList().OrderBy(x => x.Name).ToList();
-        ApplicationGroup plzSelectItem = new ApplicationGroup("Plz select");
-        plzSelectItem.Id = "";
-        groups.Insert(0, plzSelectItem);
-        ApplicationUtilities.updateListControl(roleGroupList, groups, "Id", "Name");*/
-
-
-       // ApplicationUser appuser = new ApplicationUser("allo");
-      //  appuser.
-         //   appU
         List<ApplicationUser> userList = context.Users.ToList();
         userList.Insert(0, new ApplicationUser("Select a user"));
         ApplicationUtilities.updateListControl(userDDList, context.Users.ToList(), "Id", "UserName");
-        //userDDList.DataSource = context.Users.ToList().Select(x => x.UserName);
-        //userDDList.DataBind();
-        //userDDList.Items.Insert(0, "Select a user");
         (userDDList as IPostBackDataHandler).RaisePostDataChangedEvent(); // refresh other fields
     }
 
@@ -78,9 +45,13 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
             passwordResetDiv.Visible = true;
     }
 
+
     protected void userDDList_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (context.Users.ToList().Count == 0 || getSelectedUser() == null)
+        ApplicationDbContext context = new ApplicationDbContext();
+        ApplicationGroupManager groupRoleManager = new ApplicationGroupManager();
+          UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+        if (context.Users.ToList().Count == 0 || getSelectedUser(userManager) == null)
         {
             userDiv.Visible = false;
             return;
@@ -91,50 +62,23 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
         
       
         List<ApplicationUser> users = context.Users.ToList();
-        ApplicationUser selectedUser = getSelectedUser();
-        if (selectedUser == null)
-        {
-                selectedUser = context.Users.ToList().First();
-        }
-       
+        ApplicationUser selectedUser = getSelectedUser(userManager);
             userName.Text = selectedUser.UserName;
-
-
-        /* for (int i = 0; i < users.Count; i++)
-         {
-
-             if (users.ElementAt(i).UserName.Equals(userDDList.SelectedValue))
-             {
-                 selectedUser = users.ElementAt(i);
-             }
-         }*/
 
         try
         {
-            roleDDL.SelectedValue = groupRoleManager.GetUserGroupRoles(selectedUser.Id).First().ApplicationRoleId;
+            
+            roleDDL.SelectedValue = groupRoleManager.GetUserGroups(selectedUser.Id).First().Id;
         }
         catch (Exception ex)
         {
-           // Swallow for now
+            Console.WriteLine(ex.ToString());
         }
-
-
-       // IdentityRole previousUserRole = groupRoleManager.FindById(selectedUser.Roles.First().RoleId);
-      //  roleDDL.SelectedIndex = roleDDL.Items.IndexOf(roleDDL.Items.FindByValue(previousUserRole.Name));
-        
-        
-        //selectedUser.Roles.ToList().IndexOf(previousUserRole);
-
-
     }
 
-    private void updateUserFields()
+    private ApplicationUser getSelectedUser(UserManager<ApplicationUser> userManager)
     {
 
-    }
-
-    private ApplicationUser getSelectedUser()
-    {
         if (userDDList.SelectedIndex == -1)
         {
             return null;
@@ -143,17 +87,6 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
         {
             return userManager.FindById(userDDList.SelectedValue);
         }
-        /*List<ApplicationUser> users = context.Users.ToList();
-        ApplicationUser selectedUser = null;
-        for (int i = 0; i < users.Count; i++)
-        {
-
-            if (users.ElementAt(i).UserName.Equals(userDDList.SelectedValue))
-            {
-                selectedUser = users.ElementAt(i);
-            }
-        }
-        return selectedUser;*/
     }
     private void hideAllActionMessages()
     {
@@ -165,92 +98,70 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
         UserModificationError.Visible = false;
         
     }
-    private void showErrorUserNotFound()
-    {
 
-    }
-
+    [Authorize(Roles = RolePermission.manageUser)]
     protected void changePasswordButton_Click(object sender, EventArgs e)
     {
+        ApplicationDbContext context = new ApplicationDbContext();
+        UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+
         passwordResetDiv.Visible = false;
-        //passwordResetResultMessage.Text = "Password reset sucessfully";
-        //passwordResetResultMessage.CssClass = "text-"
-        ApplicationUser user = getSelectedUser();
+        ApplicationUser user = getSelectedUser(userManager);
         if (user == null)
         {
-            userDeletedError.Visible = true;//.CssClass = "text-danger";
+            userDeletedError.Visible = true;
             userDeletedError.Text = "User deletion failed. The user could not be found";
             return;
         }
         UserStore<ApplicationUser> store = new UserStore<ApplicationUser>();
-
+        IdentityResult result  = userManager.PasswordValidator.ValidateAsync(Password.Text).Result;
+        if (!result.Succeeded)
+        {
+            passwordResetError.Visible = true;
+            passwordResetError.Text = "failed to change the password: " + result.Errors.FirstOrDefault();
+            return;
+        }
         String hashedPassword = userManager.PasswordHasher.HashPassword(Password.Text);
         store.SetPasswordHashAsync(user, hashedPassword);
 
 
 
-        userManager.Update(user);
-        passwordResetsuccess.Visible = true;
+        result = userManager.Update(user);
+        if (result.Succeeded)
+        {
+            passwordResetsuccess.Visible = true;
+        }
+        else
+        {
+            passwordResetError.Visible = true;
+            passwordResetError.Text = "failed to change the password: " + result.Errors.FirstOrDefault();
+        }
+        
 
 
     }
-
+    [Authorize(Roles = RolePermission.manageUser)]
     protected void btnSave_Click(object sender, EventArgs e)
     {
-
-        // Create a RoleStore object by using the ApplicationDbContext object. 
-        // The RoleStore is only allowed to contain IdentityRole objects.
-      //  var roleStore = new RoleStore<IdentityRole>(context);
-
-        // Create a RoleManager object that is only allowed to contain IdentityRole objects.
-        // When creating the RoleManager object, you pass in (as a parameter) a new RoleStore object. 
-        //var roleMgr = new RoleManager<IdentityRole>(roleStore);
-
-        //List<IdentityRole> roles = roleManager.Roles.ToList();
-        ApplicationUser user = getSelectedUser();
+           ApplicationDbContext context = new ApplicationDbContext();
+          UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+        ApplicationGroupManager groupRoleManager = new ApplicationGroupManager();
+        ApplicationUser user = getSelectedUser(userManager);
         if (user == null)
         {
-            userDeletedError.Visible = true;//.CssClass = "text-danger";
+            userDeletedError.Visible = true;
             userDeletedError.Text = "User deletion failed. The user could not be found";
             return;
-        }
+        } 
 
         List<ApplicationGroup> groupRoles = groupRoleManager.Groups.ToList();
         
         ApplicationGroupRole groupRole = new ApplicationGroupRole();
-        ApplicationGroup previousGroupRole = null;
+        ApplicationGroup previousGroupRole = groupRoleManager.GetUserGroups(user.Id).First();
         
-        foreach (ApplicationGroup group in groupRoles)
-        {
-            foreach(ApplicationUserGroup userGroup2 in group.ApplicationUsers)
-            {
-                if (userGroup2.ApplicationUserId.Equals(user.Id))
-                {
-                    previousGroupRole = group;
-                    break;
-                }
-            }
-            if (previousGroupRole != null)
-            {
-                break;
-            }
-
-        }
-        ApplicationUserGroup userGroup = previousGroupRole.ApplicationUsers.First(x => x.ApplicationUserId.Equals(user.Id));
-        previousGroupRole.ApplicationUsers.Remove(userGroup);
-      IdentityResult result = groupRoleManager.UpdateGroup(previousGroupRole);
-
-        if (result.Succeeded)
-        {
         ApplicationGroup currentGroupRole = groupRoleManager.Groups.ToList().Find(X => X.Id.Equals(roleDDL.SelectedValue));
-        ApplicationUserGroup tmp = new ApplicationUserGroup();
-        tmp.ApplicationGroupId = currentGroupRole.Id;
-        tmp.ApplicationUserId = roleDDL.SelectedValue;
-        currentGroupRole.ApplicationUsers.Add(tmp);
-        
-        result = groupRoleManager.UpdateGroup(currentGroupRole);
-        }
-        else
+        IdentityResult result = groupRoleManager.SetUserGroups(user.Id, currentGroupRole.Id);
+        if (!result.Succeeded)
         {
             
                 UserModificationError.Visible = true;
@@ -258,22 +169,21 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
                 return;
             
         }
-
-        if (!result.Succeeded)
+        else
         {
-
-            // undo the remove role since the operation failed
-            previousGroupRole.ApplicationUsers.Add(userGroup);
-            UserModificationError.Visible = true;
-            UserModificationError.Text = "Could not modify the user " + result.Errors.FirstOrDefault();
+            UserModificationSuccess.Visible = true;
         }
 
-        UserModificationSuccess.Visible = true;
+        
     }
 
+    [Authorize(Roles = RolePermission.removeUser)]
     protected void deleteUser_Click(object sender, EventArgs e)
     {
-        ApplicationUser user = getSelectedUser();
+        ApplicationGroupManager groupRoleManager = new ApplicationGroupManager();
+        ApplicationDbContext context = new ApplicationDbContext();
+        UserManager<ApplicationUser> userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+        ApplicationUser user = getSelectedUser(userManager);
         if (user == null)
         {
             userDeletedError.Visible = true;//.CssClass = "text-danger";
@@ -281,41 +191,32 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
             return;
         }
 
-
-        ApplicationGroupRole groupRole = new ApplicationGroupRole();
-        ApplicationGroup userAppGroup = null;
-
-        List<ApplicationGroup> groupRoles = groupRoleManager.Groups.ToList();
-        foreach (ApplicationGroup group in groupRoles)
+        IdentityResult result = groupRoleManager.ClearUserGroups(userDDList.SelectedValue);
+        if (!result.Succeeded)
         {
-            foreach (ApplicationUserGroup ug in group.ApplicationUsers)
-            {
-                if (ug.ApplicationUserId.Equals(user.Id))
-                {
-                    userAppGroup = group;
-                    break;
-                }
-            }
-            if (userAppGroup != null)
-            {
-                break;
-            }
-
-        }
-        ApplicationUserGroup userGroup = userAppGroup.ApplicationUsers.First(x => x.ApplicationUserId.Equals(user.Id));
-        userAppGroup.ApplicationUsers.Remove(userGroup);
-        IdentityResult result = groupRoleManager.UpdateGroup(userAppGroup);
-
-        if (result.Succeeded)
-        {
-            refreshUserDDList();
-            userDeletedSuccess.Visible = true;// "User successfully deleted";
-            
-        }
-        else
-        {
-            userDeletedError.Visible = true;//.CssClass = "text-danger";
+            userDeletedError.Visible = true;
             userDeletedError.Text = "User deletion failed with " + result.Errors.FirstOrDefault();
         }
+        // Refresh the usermanager to avoid concurrency exception
+        context.Dispose();
+        context = new ApplicationDbContext();
+        userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+        
+        ApplicationUser user2 = userManager.FindById(userDDList.SelectedValue);
+        
+         result = userManager.Delete(user2);
+        
+        if (!result.Succeeded)
+        {
+            userDeletedError.Visible = true;
+            userDeletedError.Text = "User deletion failed with " + result.Errors.FirstOrDefault();
+        }
+        
+
+
+        refreshUserDDList(context);
+        userDeletedSuccess.Visible = true;// "User successfully deleted";
     }
 }
+ 
+ 

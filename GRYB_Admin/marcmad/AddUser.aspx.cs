@@ -14,46 +14,27 @@ using GRYB_Admin;
 
 public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
 {
-    RoleManager<IdentityRole> roleMgr;
     protected void Page_Load(object sender, EventArgs e)
     {
-        // AddUserAndRole();
         ApplicationDbContext context = new ApplicationDbContext();
-        // Create a RoleStore object by using the ApplicationDbContext object. 
-        // The RoleStore is only allowed to contain IdentityRole objects.
         var roleStore = new RoleStore<IdentityRole>(context);
 
-        
+      //  groupMgr = new ApplicationGroupManager();
+       // userMgr = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
 
         if (!IsPostBack)
         {
-            ApplicationGroupManager roleMgr = new ApplicationGroupManager();
-
-                //roleGroupList.Items.Clear();
-                List<ApplicationGroup> groupRoles = roleMgr.Groups.ToList().OrderBy(x => x.Name).ToList();
+            ApplicationGroupManager groupMgr = new ApplicationGroupManager();
+                List<ApplicationGroup> groupRoles = groupMgr.Groups.ToList().OrderBy(x => x.Name).ToList();
                 ApplicationUtilities.updateListControl(roleDDL, groupRoles, "Id", "Name");
         }
-        
-        
-        
-        
-       // Microsoft.AspNet.Identity.IRoleStore
-        //Microsoft.AspNet.Identity.RoleManager
-
-        // roles.Items.Add(item);
     }
 
     protected void Register_Click(object sender, EventArgs e)
     {
+        ApplicationGroupManager groupMgr = new ApplicationGroupManager();
+        UserManager<ApplicationUser> userMgr = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
 
-        ApplicationDbContext context = new ApplicationDbContext();
-        // Create a RoleStore object by using the ApplicationDbContext object. 
-        // The RoleStore is only allowed to contain IdentityRole objects.
-       // RoleStore< IdentityRole> roleStore = new RoleStore<IdentityRole>(context);
-        ApplicationGroupManager roleMgr = new ApplicationGroupManager();
-
-        UserManager<ApplicationUser> userMgr = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
-        
         ApplicationUser appUser = new ApplicationUser
         {
             UserName = UserName.Text,
@@ -66,18 +47,9 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
             return;
         }
 
-        roleMgr.SetUserGroups(appUser.Id, roleDDL.SelectedValue);
-       /* ApplicationGroup currentGroupRole = roleMgr.Groups.ToList().Find(X => X.Id.Equals(roleDDL.SelectedValue));
-        ApplicationGroupManager roleManager = new ApplicationGroupManager();
-        ApplicationUserGroup userGroup = new ApplicationUserGroup();
-        userGroup.ApplicationGroupId = currentGroupRole.Id;
-        userGroup.ApplicationUserId = appUser.Id;
-        currentGroupRole.ApplicationUsers.Add(userGroup);
-        roleMgr.UpdateGroup(currentGroupRole);*/
-
-       // result = userMgr.AddToRole(userMgr.FindByName(appUser.UserName).Id, roleDDL.SelectedValue);
-
-    
+        groupMgr.SetUserGroups(appUser.Id, roleDDL.SelectedValue);
+        groupMgr.GetUserGroupRoles(appUser.Id);
+        
         if (!result.Succeeded)
         {
             SuccessMessage.Text = "";

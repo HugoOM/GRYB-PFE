@@ -5,17 +5,10 @@ using System.Web;
 using System.Web.UI.WebControls;
 
 /// <summary>
-/// Summary description for ApplicationUtilities
+/// Class for methods that will be used throughout the application
 /// </summary>
-public class ApplicationUtilities
+public static class ApplicationUtilities
 {
-    public ApplicationUtilities()
-    {
-        //
-        // TODO: Add constructor logic here
-        //
-    }
-
     public static void updateListControl<T>(ListControl control, List<T> fieldElements, String idField, String textValue)
     {
         control.DataSource = fieldElements;

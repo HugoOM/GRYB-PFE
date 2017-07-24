@@ -22,23 +22,21 @@ public class ApplicationGroupManager
 
     public ApplicationGroupManager()
     {
-        //new ApplicationDbContext();
-        _db = new ApplicationDbContext();// System.Web.HttpContext.Current.GetOwinContext().Get<ApplicationDbContext>();
-        var userStore = new UserStore<ApplicationUser>(_db);
-         _userManager = new UserManager<ApplicationUser>(userStore);
+        _db = new ApplicationDbContext();
         _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(_db));
 
-        var roleStore = new RoleStore<ApplicationRole>(_db);
-         _roleManager = new RoleManager<ApplicationRole>(roleStore);
-
-        //_db = new ApplicationDbContext(conText);
-        /*_db = HttpContext.Current
-            .GetOwinContext().Get<ApplicationDbContext>();
-       /* _userManager = HttpContext.Current
-            .GetOwinContext().GetUserManager<ApplicationUserManager>();
-        _roleManager = HttpContext.Current
-            .GetOwinContext().Get<ApplicationRoleManager>();*/
+         _roleManager = new RoleManager<ApplicationRole>(new RoleStore<ApplicationRole>(_db));
         _groupStore = new ApplicationGroupStore(_db);
+    }
+
+    public ApplicationGroupManager(ApplicationDbContext db)
+    {
+        _db = db;
+        _userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
+
+        //var roleStore = new RoleStore<ApplicationRole>(_db);
+        _roleManager = new RoleManager<ApplicationRole>(new RoleStore<ApplicationRole>(db));
+        _groupStore = new ApplicationGroupStore(db);
     }
 
 
@@ -65,7 +63,7 @@ public class ApplicationGroupManager
     }
 
 
-    public IdentityResult SetGroupRoles(string groupId, params string[] roleNames)
+    public IdentityResult SetGroupRoles(string groupId, List<String> roleNames)
     {
         // Clear all the roles associated with this group:
         var thisGroup = this.FindById(groupId);
@@ -74,7 +72,7 @@ public class ApplicationGroupManager
 
 
         // Add the new roles passed in:
-        var newRoles = _roleManager.Roles.Where(r => roleNames.Any(n => n == r.Name));
+        var newRoles = _roleManager.Roles.Where(r => roleNames.Any(n => n.Equals(r.Name)));
         foreach (var role in newRoles)
         {
             thisGroup.ApplicationRoles.Add(new ApplicationGroupRole
@@ -106,7 +104,7 @@ public class ApplicationGroupManager
 
         // Add the new roles passed in:
         var newRoles = _roleManager.Roles
-                        .Where(r => roleNames.Any(n => n == r.Name));
+                        .Where(r => roleNames.Any(n => n.Equals(r.Name)));
 
         foreach (var role in newRoles)
         {
@@ -137,7 +135,7 @@ public class ApplicationGroupManager
         {
             group.ApplicationUsers
                 .Remove(group.ApplicationUsers
-                .FirstOrDefault(gr => gr.ApplicationUserId == userId
+                .FirstOrDefault(gr => gr.ApplicationUserId.Equals(userId)
             ));
         }
         await _db.SaveChangesAsync();
@@ -169,7 +167,7 @@ public class ApplicationGroupManager
         {
             group.ApplicationUsers
                 .Remove(group.ApplicationUsers
-                .FirstOrDefault(gr => gr.ApplicationUserId == userId
+                .FirstOrDefault(gr => gr.ApplicationUserId.Equals(userId)
             ));
         }
         _db.SaveChanges();
@@ -195,6 +193,7 @@ public class ApplicationGroupManager
 
     public IdentityResult RefreshUserGroupRoles(string userId)
     {
+        
         var user = _userManager.FindById(userId);
         if (user == null)
         {
@@ -216,7 +215,7 @@ public class ApplicationGroupManager
         // Get the damn role names:
         var allRoles = _roleManager.Roles.ToList();
         var addTheseRoles = allRoles
-            .Where(r => newGroupRoles.Any(gr => gr.ApplicationRoleId == r.Id
+            .Where(r => newGroupRoles.Any(gr => gr.ApplicationRoleId.Equals(r.Id)
         ));
 
         var roleNames = addTheseRoles.Select(n => n.Name).ToArray();
@@ -249,7 +248,7 @@ public class ApplicationGroupManager
         // Get the damn role names:
         var allRoles = await _roleManager.Roles.ToListAsync();
         var addTheseRoles = allRoles
-            .Where(r => newGroupRoles.Any(gr => gr.ApplicationRoleId == r.Id
+            .Where(r => newGroupRoles.Any(gr => gr.ApplicationRoleId.Equals(r.Id)
         ));
 
         var roleNames = addTheseRoles.Select(n => n.Name).ToArray();
@@ -359,7 +358,7 @@ public class ApplicationGroupManager
         var result = new List<ApplicationGroup>();
         var userGroups = (from g in this.Groups
                           where g.ApplicationUsers
-                            .Any(u => u.ApplicationUserId == userId)
+                            .Any(u => u.ApplicationUserId.Equals(userId))
                           select g).ToListAsync();
         return await userGroups;
     }
@@ -370,7 +369,7 @@ public class ApplicationGroupManager
         var result = new List<ApplicationGroup>();
         var userGroups = (from g in this.Groups
                           where g.ApplicationUsers
-                            .Any(u => u.ApplicationUserId == userId)
+                            .Any(u => u.ApplicationUserId.Equals(userId))
                           select g).ToList();
         return userGroups;
     }
@@ -380,11 +379,11 @@ public class ApplicationGroupManager
         string groupId)
     {
         var grp = await _db.ApplicationGroups
-            .FirstOrDefaultAsync(g => g.Id == groupId);
+            .FirstOrDefaultAsync(g => g.Id.Equals(groupId));
         var roles = await _roleManager.Roles.ToListAsync();
         var groupRoles = (from r in roles
                           where grp.ApplicationRoles
-                            .Any(ap => ap.ApplicationRoleId == r.Id)
+                            .Any(ap => ap.ApplicationRoleId.Equals(r.Id))
                           select r).ToList();
         return groupRoles;
     }
@@ -392,11 +391,11 @@ public class ApplicationGroupManager
 
     public IEnumerable<ApplicationRole> GetGroupRoles(string groupId)
     {
-        var grp = _db.ApplicationGroups.FirstOrDefault(g => g.Id == groupId);
+        var grp = _db.ApplicationGroups.FirstOrDefault(g => g.Id.Equals(groupId));
         var roles = _roleManager.Roles.ToList();
         var groupRoles = from r in roles
                          where grp.ApplicationRoles
-                            .Any(ap => ap.ApplicationRoleId == r.Id)
+                            .Any(ap => ap.ApplicationRoleId.Equals(r.Id))
                          select r;
         return groupRoles;
     }
@@ -422,7 +421,7 @@ public class ApplicationGroupManager
         foreach (var groupUser in group.ApplicationUsers)
         {
             var user = await _db.Users
-                .FirstOrDefaultAsync(u => u.Id == groupUser.ApplicationUserId);
+                .FirstOrDefaultAsync(u => u.Id.Equals(groupUser.ApplicationUserId));
             users.Add(user);
         }
         return users;

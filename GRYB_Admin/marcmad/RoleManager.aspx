@@ -11,6 +11,8 @@
         <asp:Button ID="addRoleBtn" Text="add role"  runat="server" OnClick="addRole_Click"/>
         <asp:Button ID="removeRole" Text="remove role"  runat="server" OnClick="removeRole_Click"/>
         <asp:TextBox ID="addRoleGroupBox" runat="server" ></asp:TextBox>
+        <p><asp:Label ID="addRoleSuccess" CssClass="text-success" EnableViewState="false" runat="server" Text="Rôle ajouté avec succès" Visible="false"></asp:Label></p>
+        <p><asp:Label ID="addRoleFailure" CssClass="text-danger" EnableViewState="false" runat="server" Visible="false"></asp:Label></p>
     <div id="permissionDiv" runat="server" visible="false">
      
     <div class="form-group"></div> 
