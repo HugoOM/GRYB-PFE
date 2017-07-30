@@ -4,10 +4,13 @@ using System;
 using System.Web;
 using System.Web.UI;
 using GRYB_Admin;
+using Npgsql;
+using System.Data;
 
 public partial class Account_Login : Page
 {
-        protected void Page_Load(object sender, EventArgs e)
+
+    protected void Page_Load(object sender, EventArgs e)
         {
             RegisterHyperLink.NavigateUrl = "Register";
             OpenAuthLogin.ReturnUrl = Request.QueryString["ReturnUrl"];
@@ -29,12 +32,13 @@ public partial class Account_Login : Page
                 {
                     IdentityHelper.SignIn(manager, user, RememberMe.Checked);
                     IdentityHelper.RedirectToReturnUrl(Request.QueryString["ReturnUrl"], Response);
+
                 }
                 else
                 {
                     FailureText.Text = "Invalid username or password.";
                     ErrorMessage.Visible = true;
-                }
+            }
             }
         }
 }
