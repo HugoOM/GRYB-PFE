@@ -49,8 +49,8 @@ CREATE TABLE projet_membre
   id_projet INTEGER NOT NULL,
   id_membre INTEGER NOT NULL,
   CONSTRAINT projet_membre_pk PRIMARY KEY (id_projet_membre),
-  CONSTRAINT projet_membre_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet),
-  CONSTRAINT projet_membre_id_membre_fk FOREIGN KEY (id_membre) REFERENCES membre(id_membre)
+  CONSTRAINT projet_membre_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet) ON DELETE CASCADE,
+  CONSTRAINT projet_membre_id_membre_fk FOREIGN KEY (id_membre) REFERENCES membre(id_membre) ON DELETE CASCADE
 );
 
 CREATE TABLE projet_photo
@@ -58,8 +58,8 @@ CREATE TABLE projet_photo
   id_projet_photo SERIAL,
   id_projet INTEGER NOT NULL,
   image_url VARCHAR(250) NOT NULL,
-  CONSTRAINT projet_photo_pk PRIMARY KEY (id_projet_photo),
-  CONSTRAINT projet_photo_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet)
+  CONSTRAINT projet_photo_pk PRIMARY KEY (id_projet_photo) ON DELETE CASCADE,
+  CONSTRAINT projet_photo_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet) ON DELETE CASCADE
 );
 
 CREATE TABLE machine
@@ -84,7 +84,7 @@ CREATE TABLE machine_instance
   numero_serie VARCHAR(50) NOT NULL,
   description VARCHAR(250) NULL,
   CONSTRAINT machine_instance_pk PRIMARY KEY (id_machine_instance),
-  CONSTRAINT machine_instance_id_machine_fk FOREIGN KEY (id_machine) REFERENCES machine(id_machine)
+  CONSTRAINT machine_instance_id_machine_fk FOREIGN KEY (id_machine) REFERENCES machine(id_machine) ON DELETE CASCADE
 );
 
 CREATE TABLE machine_projet
@@ -93,8 +93,8 @@ CREATE TABLE machine_projet
   id_projet INTEGER NOT NULL,
   id_machine_instance INTEGER NOT NULL,
   CONSTRAINT machine_projet_pk PRIMARY KEY (id_machine_projet),
-  CONSTRAINT machine_projet_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet),
-  CONSTRAINT machine_projet_id_machine_instance_fk FOREIGN KEY (id_machine_instance) REFERENCES machine_instance(id_machine_instance)
+  CONSTRAINT machine_projet_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet) ON DELETE CASCADE,
+  CONSTRAINT machine_projet_id_machine_instance_fk FOREIGN KEY (id_machine_instance) REFERENCES machine_instance(id_machine_instance) ON DELETE CASCADE
 );
 
 CREATE TABLE machine_photo
@@ -103,7 +103,7 @@ CREATE TABLE machine_photo
   id_machine INTEGER NOT NULL,
   image_url VARCHAR(250) NOT NULL,
   CONSTRAINT machine_photo_pk PRIMARY KEY (id_machine_photo),
-  CONSTRAINT machine_photo_id_machine_fk FOREIGN KEY (id_machine) REFERENCES machine(id_machine)
+  CONSTRAINT machine_photo_id_machine_fk FOREIGN KEY (id_machine) REFERENCES machine(id_machine) ON DELETE CASCADE
 );
 
 CREATE TABLE machine_localisation
@@ -113,7 +113,7 @@ CREATE TABLE machine_localisation
   description VARCHAR(250) NULL,
   remarque VARCHAR(250) NULL,
   CONSTRAINT machine_localisation_pk PRIMARY KEY (id_machine_localisation),
-  CONSTRAINT machine_localisation_id_machine_fk FOREIGN KEY (id_machine) REFERENCES machine(id_machine)
+  CONSTRAINT machine_localisation_id_machine_fk FOREIGN KEY (id_machine) REFERENCES machine(id_machine) ON DELETE CASCADE
 );
 
 CREATE TABLE machine_instance_photo
@@ -122,7 +122,7 @@ CREATE TABLE machine_instance_photo
   id_machine_instance INTEGER NOT NULL,
   image_url VARCHAR(250) NOT NULL,
   CONSTRAINT machine_instance_photo_pk PRIMARY KEY (id_machine_instance_photo),
-  CONSTRAINT machine_instance_photo_id_machine_instance_fk FOREIGN KEY (id_machine_instance) REFERENCES machine_instance(id_machine_instance)
+  CONSTRAINT machine_instance_photo_id_machine_instance_fk FOREIGN KEY (id_machine_instance) REFERENCES machine_instance(id_machine_instance) ON DELETE CASCADE
 );
 
 CREATE TABLE attachement
@@ -149,7 +149,7 @@ CREATE TABLE attachement_instance
     type_compatibilite VARCHAR(50) NOT NULL,
     nb_heure_entre_entretient DECIMAL NOT NULL,
     CONSTRAINT attachement_instance_pk PRIMARY KEY (id_attachement_instance),
-    CONSTRAINT attachement_instance_id_attachement_fk FOREIGN KEY (id_attachement) REFERENCES attachement(id_attachement)
+    CONSTRAINT attachement_instance_id_attachement_fk FOREIGN KEY (id_attachement) REFERENCES attachement(id_attachement) ON DELETE CASCADE
 );
 
 CREATE TABLE attachement_localisation
@@ -165,7 +165,7 @@ CREATE TABLE attachement_localisation
     industrie VARCHAR(250) NULL,
     produit VARCHAR(250) NULL,
     CONSTRAINT attachement_localisation_pk PRIMARY KEY (id_attachement_localisation),
-    CONSTRAINT attachement_localisation_id_attachement_fk FOREIGN KEY (id_attachement) REFERENCES attachement(id_attachement)
+    CONSTRAINT attachement_localisation_id_attachement_fk FOREIGN KEY (id_attachement) REFERENCES attachement(id_attachement) ON DELETE CASCADE
 );
 
 CREATE TABLE attachement_photo
@@ -174,7 +174,7 @@ CREATE TABLE attachement_photo
     id_attachement INTEGER NOT NULL,
     image_url VARCHAR(250) NOT NULL,
     CONSTRAINT attachement_photo_pk PRIMARY KEY (id_attachement_photo),
-    CONSTRAINT attachement_photo_id_attachement_fk FOREIGN KEY (id_attachement) REFERENCES attachement(id_attachement)
+    CONSTRAINT attachement_photo_id_attachement_fk FOREIGN KEY (id_attachement) REFERENCES attachement(id_attachement) ON DELETE CASCADE
 );
 
 CREATE TABLE attachement_projet
@@ -183,8 +183,8 @@ CREATE TABLE attachement_projet
     id_projet INTEGER NOT NULL,
     id_attachement_instance INTEGER NOT NULL,
     CONSTRAINT attachement_projet_pk PRIMARY KEY (id_attachement_projet),
-    CONSTRAINT attachement_projet_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet),
-    CONSTRAINT attachement_projet_id_attachement_instance_fk FOREIGN KEY (id_attachement_instance) REFERENCES attachement_instance(id_attachement_instance)
+    CONSTRAINT attachement_projet_id_projet_fk FOREIGN KEY (id_projet) REFERENCES projet(id_projet) ON DELETE CASCADE,
+    CONSTRAINT attachement_projet_id_attachement_instance_fk FOREIGN KEY (id_attachement_instance) REFERENCES attachement_instance(id_attachement_instance) ON DELETE CASCADE
 );
 
 
