@@ -6,9 +6,11 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Npgsql;
 using System.Data;
+using System.Drawing;
 
 public partial class Account_Projets : System.Web.UI.Page
 {
+    //Connection string to the database
     private string connstring = String.Format("Server={0};Port={1};" +
     "User Id={2};Password={3};Database={4}; SSL Mode={5};Trust Server Certificate={6};",
     "ec2-107-21-99-176.compute-1.amazonaws.com", "5432", "hufmyrumplrijg",
@@ -17,6 +19,7 @@ public partial class Account_Projets : System.Web.UI.Page
     private DataTable dt = new DataTable();
     protected void Page_Load(object sender, EventArgs e)
     {
+        //Fill the GridView/refresh the GridView
         if (!IsPostBack)
         {
             select_All();
@@ -26,12 +29,11 @@ public partial class Account_Projets : System.Web.UI.Page
     {
         try
         {
-            // Making connection with Npgsql provider
+            //Opening the connection to the DB
             NpgsqlConnection conn = new NpgsqlConnection(connstring);
             conn.Open();
-            // quite complex sql statement
+            //The Select SQL Command to execute
             string sql = "SELECT * FROM projet";
-            // data adapter making request from our connection
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
             conn.Close();
@@ -54,48 +56,23 @@ public partial class Account_Projets : System.Web.UI.Page
         }
         catch (Exception msg)
         {
-            Console.WriteLine(msg);
-            throw;
-        }
-    }
-    protected void delete(Object sender,
-                           EventArgs e)
-    {
-        string deleteId = Request.Form["deleteId"];
-        try
-        {
-            // Making connection with Npgsql provider
-            NpgsqlConnection conn = new NpgsqlConnection(connstring);
-            conn.Open();
-            // quite complex sql statement
-            string sql = "Delete FROM projet Where id_projet = "+ deleteId+"";
-            // data adapter making request from our connection
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
-            da.Fill(ds);
-            dt = ds.Tables[0];
-            conn.Close();
-        }
-        catch (Exception msg)
-        {
-            Console.WriteLine(msg);
-            throw;
+            //DB error are trown in a Label
+            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
         }
     }
     
     protected void insert(Object sender,
                            EventArgs e)
     {
-        string addId = Request.Form["addorupdateID"];
-        string addName = Request.Form["addorupdateName"];
+        //Get data from the form
+        string addName = Request.Form["addName"];
         try
         {
-            
-            // Making connection with Npgsql provider
+            //Connect to the DB
             NpgsqlConnection conn = new NpgsqlConnection(connstring);
             conn.Open();
-            // quite complex sql statement
-            string sql = "Insert into projet (id_projet,nom) Values("+addId+",'"+addName+"')";
-            // data adapter making request from our connection
+            //The Insert SQL command to execute
+            string sql = "Insert into projet (nom) Values('"+addName+"')";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
             dt = ds.Tables[0];
@@ -103,54 +80,72 @@ public partial class Account_Projets : System.Web.UI.Page
         }
         catch (Exception msg)
         {
-            Console.WriteLine(msg);
-            throw;
-        }
-    }
-    protected void update(Object sender,
-                       EventArgs e)
-    {
-        string updateId = Request.Form["addorupdateID"];
-        string updateName = Request.Form["addorupdateName"];
-        try
-        {
-
-            // Making connection with Npgsql provider
-            NpgsqlConnection conn = new NpgsqlConnection(connstring);
-            conn.Open();
-            // quite complex sql statement
-            string sql = "UPDATE projet (nom) Values('" + updateName + "') WHERE id_projet = "+ updateId + "";
-            // data adapter making request from our connection
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
-            da.Fill(ds);
-            dt = ds.Tables[0];
-            conn.Close();
-        }
-        catch (Exception msg)
-        {
-            Console.WriteLine(msg);
-            throw;
+            //DB error are trown in a Label
+            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
         }
     }
     protected void GridView_RowDeleting(object sender, GridViewDeleteEventArgs e)
     {
-        select_All();
-    }
-    protected void GridView_RowEditing(object sender, GridViewEditEventArgs e)
-    {
-        select_All();
+        try
+        {
+            //Connect to the DB
+            NpgsqlConnection conn = new NpgsqlConnection(connstring);
+            conn.Open();
+            //The Delete SQL command to execute
+            string sql = "Delete FROM projet Where id_projet = " + Convert.ToInt32(ProjectGridView.DataKeys[e.RowIndex].Value.ToString()) + "";
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
+            da.Fill(ds);
+            dt = ds.Tables[0];
+            conn.Close();
+            select_All();
+        }
+        catch (Exception msg)
+        {
+            //DB error are trown in a Label
+            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
+        }
+        
     }
     protected void GridView_RowUpdating(object sender, GridViewUpdateEventArgs e)
     {
+
+        try
+        {
+            //Get the value from the GridView
+            int projectID = Convert.ToInt32(ProjectGridView.DataKeys[e.RowIndex].Value.ToString());
+            GridViewRow row = (GridViewRow)ProjectGridView.Rows[e.RowIndex];
+            TextBox text_Name = (TextBox)row.FindControl("name_Text");
+            ProjectGridView.EditIndex = -1;
+            //Connect to the DB
+            NpgsqlConnection conn = new NpgsqlConnection(connstring);
+            conn.Open();
+            //The Update SQL command to execute
+            string sql = "UPDATE projet SET nom='" + text_Name.Text + "' WHERE id_projet = " + projectID + "";
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
+            da.Fill(ds);
+            conn.Close();
+            select_All();
+        }
+        catch (Exception msg)
+        {
+            //DB error are trown in a Label
+            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
+        }
+    }
+    //The commands that are in charge of the transition in the grid view
+    protected void GridView_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        ProjectGridView.EditIndex = e.NewEditIndex;
         select_All();
     }
     protected void GridView_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
     {
+        ProjectGridView.EditIndex = -1;
         select_All();
     }
-
     protected void GridView_PageIndexChanging(object sender, GridViewPageEventArgs e)
     {
+        ProjectGridView.PageIndex = e.NewPageIndex;
         select_All();
     }
 

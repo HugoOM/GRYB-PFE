@@ -9,6 +9,7 @@ using System.Data;
 
 public partial class Account_Machine : System.Web.UI.Page
 {
+    //Connection string to the database
     private string connstring = String.Format("Server={0};Port={1};" +
     "User Id={2};Password={3};Database={4}; SSL Mode={5};Trust Server Certificate={6};",
     "ec2-107-21-99-176.compute-1.amazonaws.com", "5432", "hufmyrumplrijg",
@@ -17,18 +18,21 @@ public partial class Account_Machine : System.Web.UI.Page
     private DataTable dt = new DataTable();
     protected void Page_Load(object sender, EventArgs e)
     {
-        select_All();
+        //Fill the GridView/refresh the GridView
+        if (!IsPostBack)
+        {
+            select_All();
+        }
     }
     protected void select_All()
     {
         try
         {
-            // Making connection with Npgsql provider
+            //Opening the connection to the DB
             NpgsqlConnection conn = new NpgsqlConnection(connstring);
             conn.Open();
-            // quite complex sql statement
+            //The Select SQL Command to execute
             string sql = "SELECT * FROM machine";
-            // data adapter making request from our connection
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
             conn.Close();
@@ -51,56 +55,32 @@ public partial class Account_Machine : System.Web.UI.Page
         }
         catch (Exception msg)
         {
-            Console.WriteLine(msg);
-            throw;
-        }
-    }
-    protected void delete(Object sender,
-                               EventArgs e)
-    {
-        string deleteId = Request.Form["deleteId"];
-        try
-        {
-            // Making connection with Npgsql provider
-            NpgsqlConnection conn = new NpgsqlConnection(connstring);
-            conn.Open();
-            // quite complex sql statement
-            string sql = "Delete FROM machine Where id_machine = " + deleteId + "";
-            // data adapter making request from our connection
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
-            da.Fill(ds);
-            dt = ds.Tables[0];
-            conn.Close();
-        }
-        catch (Exception msg)
-        {
-            Console.WriteLine(msg);
-            throw;
+            //DB error are trown in a Label
+            ErrorManagement.Text = "une erreur s'est produite : " + msg.ToString();
         }
     }
 
     protected void insert(Object sender,
                            EventArgs e)
     {
-        string addId = Request.Form["addorupdateID"];
-        string addName = Request.Form["addorupdateMarque"];
-        string addModele = Request.Form["addorupdateModele"];
-        string addMarque = Request.Form["addorupdateMarque"];
-        string addHauteur = Request.Form["addorupdateHauteur"];
-        string addLargeur = Request.Form["addorupdateLargeur"];
-        string addPoid = Request.Form["addorupdatePoid"];
-        string addCapacite = Request.Form["addorupdateCapacite"];
-        string addNbHeure = Request.Form["addorupdateNbHeure"];
-        string addCompatibilite = Request.Form["addorupdateCompatibilite"];
+        //Get data from the form
+        string addName = Request.Form["addMarque"];
+        string addModele = Request.Form["addModele"];
+        string addMarque = Request.Form["addMarque"];
+        string addHauteur = Request.Form["addHauteur"];
+        string addLargeur = Request.Form["addLargeur"];
+        string addPoid = Request.Form["addPoid"];
+        string addCapacite = Request.Form["addCapacite"];
+        string addNbHeure = Request.Form["addNbHeure"];
+        string addCompatibilite = Request.Form["addCompatibilite"];
         try
         {
 
-            // Making connection with Npgsql provider
+            //Connect to the DB
             NpgsqlConnection conn = new NpgsqlConnection(connstring);
             conn.Open();
-            // quite complex sql statement
-            string sql = "Insert into machine (id_machine,marque,modele,hauteur,largeur,poids,capacite,nb_heure_entre_entretient,type_compatibilite) Values(" + addId + ",'" + addMarque + "','"+addModele+"',"+addHauteur+ "," + addLargeur + "," + addPoid + "," + addCapacite + "," + addNbHeure + ",'"+addCompatibilite+"')";
-            // data adapter making request from our connection
+            //The Insert SQL command to execute
+            string sql = "Insert into machine (marque,modele,hauteur,largeur,poids,capacite,nb_heure_entre_entretient,type_compatibilite) Values('" + addMarque + "','"+addModele+"',"+addHauteur+ "," + addLargeur + "," + addPoid + "," + addCapacite + "," + addNbHeure + ",'"+addCompatibilite+"')";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
             dt = ds.Tables[0];
@@ -108,62 +88,79 @@ public partial class Account_Machine : System.Web.UI.Page
         }
         catch (Exception msg)
         {
-            Console.WriteLine(msg);
-            throw;
-        }
-    }
-
-    protected void update(Object sender,
-                       EventArgs e)
-    {
-        string updateId = Request.Form["addorupdateID"];
-        string updateName = Request.Form["addorupdateMarque"];
-        string updateModele = Request.Form["addorupdateModele"];
-        string updateMarque = Request.Form["addorupdateMarque"];
-        string updateHauteur = Request.Form["addorupdateHauteur"];
-        string updateLargeur = Request.Form["addorupdateLargeur"];
-        string updatePoid = Request.Form["addorupdatePoid"];
-        string updateCapacite = Request.Form["addorupdateCapacite"];
-        string updateNbHeure = Request.Form["addorupdateNbHeure"];
-        string updateCompatibilite = Request.Form["addorupdateCompatibilite"];
-        try
-        {
-
-            // Making connection with Npgsql provider
-            NpgsqlConnection conn = new NpgsqlConnection(connstring);
-            conn.Open();
-            // quite complex sql statement
-            string sql = "UPDATE machine (marque,modele,hauteur,largeur,poids,capacite,nb_heure_entre_entretient,type_compatibilite) Values('" + updateMarque + "','" + updateModele + "'," + updateHauteur + "," + updateLargeur + "," + updatePoid + "," + updateCapacite + "," + updateNbHeure + ",'" + updateCompatibilite + "') WHERE id_machine = "+ updateId + "";
-            // data adapter making request from our connection
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
-            da.Fill(ds);
-            dt = ds.Tables[0];
-            conn.Close();
-        }
-        catch (Exception msg)
-        {
-            Console.WriteLine(msg);
-            throw;
+            //DB error are trown in a Label
+            ErrorManagement.Text = "une erreur s'est produite : " + msg.ToString();
         }
     }
     protected void GridView_RowDeleting(object sender, GridViewDeleteEventArgs e)
     {
-        select_All();
-    }
-    protected void GridView_RowEditing(object sender, GridViewEditEventArgs e)
-    {
+        try
+        {
+            //Connect to the DB
+            NpgsqlConnection conn = new NpgsqlConnection(connstring);
+            conn.Open();
+            //The Delete SQL command to execute
+            string sql = "Delete FROM machine Where id_machine = " + Convert.ToInt32(MachineGridView.DataKeys[e.RowIndex].Value.ToString()) + "";
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
+            da.Fill(ds);
+            dt = ds.Tables[0];
+            conn.Close();
+        }
+        catch (Exception msg)
+        {
+            //DB error are trown in a Label
+            ErrorManagement.Text = "une erreur s'est produite : " + msg.ToString();
+        }
         select_All();
     }
     protected void GridView_RowUpdating(object sender, GridViewUpdateEventArgs e)
     {
+        try
+        {
+            //Get the value from the GridView
+            int machineID = Convert.ToInt32(MachineGridView.DataKeys[e.RowIndex].Value.ToString());
+            GridViewRow row = (GridViewRow)MachineGridView.Rows[e.RowIndex];
+            TextBox text_Marque = (TextBox)row.FindControl("marque_Text");
+            TextBox text_Modele = (TextBox)row.FindControl("modele_Text");
+            TextBox text_Hauteur = (TextBox)row.FindControl("hauteur_Text");
+            TextBox text_Largeur = (TextBox)row.FindControl("largeur_Text");
+            TextBox text_Poids = (TextBox)row.FindControl("poids_Text");
+            TextBox text_Capacite = (TextBox)row.FindControl("capacite_Text");
+            TextBox text_Nb_heure_entre_entretient = (TextBox)row.FindControl("nb_heure_entre_entretient_Text");
+            TextBox text_Type_compatibilite = (TextBox)row.FindControl("type_compatibilite_Text");
+            MachineGridView.EditIndex = -1;
+            //Connect to the DB
+            NpgsqlConnection conn = new NpgsqlConnection(connstring);
+            conn.Open();
+            //The Update SQL command to execute
+            string sql = "UPDATE machine SET marque='" + text_Marque.Text + "', modele='" + text_Modele.Text + "',hauteur='" + text_Hauteur.Text + "'," +
+                "largeur='" + text_Largeur.Text + "',poids='" + text_Poids.Text + "',capacite='" + text_Capacite.Text + "',nb_heure_entre_entretient='" + text_Nb_heure_entre_entretient.Text + "'," +
+                "type_compatibilite='" + text_Type_compatibilite.Text + "' WHERE id_machine = " + machineID + "";
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
+            da.Fill(ds);
+            conn.Close();
+            select_All();
+        }
+        catch (Exception msg)
+        {
+            //DB error are trown in a Label
+            ErrorManagement.Text = "une erreur s'est produite : " + msg.ToString();
+        }
+    }
+    //The commands that are in charge of the transition in the grid view
+    protected void GridView_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        MachineGridView.EditIndex = e.NewEditIndex;
         select_All();
     }
     protected void GridView_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
     {
+        MachineGridView.EditIndex = -1;
         select_All();
     }
     protected void GridView_PageIndexChanging(object sender, GridViewPageEventArgs e)
     {
+        MachineGridView.PageIndex = e.NewPageIndex;
         select_All();
     }
 }
