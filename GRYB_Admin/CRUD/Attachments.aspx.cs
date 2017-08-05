@@ -64,14 +64,14 @@ public partial class Account_Attachments : System.Web.UI.Page
                            EventArgs e)
     {
         //Get data from the form
-        string addNumAttachement = Request.Form["addNumAttachement"];
-        string addNumSerie = Request.Form["addNumSerie"];
-        string addCompatibilite = Request.Form["addCompatibilite"];
-        string addMarque = Request.Form["addMarque"];
-        string addModele = Request.Form["addModele"];
-        string addHauteur = Request.Form["addHauteur"];
-        string addLargeur = Request.Form["addLargeur"];
-        string addNbHeure = Request.Form["addNbHeure"];
+        string addNumAttachement = addNumAttachementText.Text;
+        string addNumSerie = addNumSerieText.Text;
+        string addCompatibilite = addCompatibiliteText.Text;
+        string addMarque = addMarqueText.Text;
+        string addModele = addModeleText.Text;
+        string addHauteur = addHauteurText.Text;
+        string addLargeur = addLargeurText.Text;
+        string addNbHeure = addNbHeureText.Text;
         try
         {
             //Connect to the DB
@@ -81,8 +81,8 @@ public partial class Account_Attachments : System.Web.UI.Page
             string sql = "Insert into attachement (numero_attachement,numero_serie,type_compatibilite,marque,modele,hauteur,largeur,nb_heure_entre_entretient) Values('" + addNumAttachement + "','" + addNumSerie + "'," + addCompatibilite + "," + addMarque + "," + addModele + "," + addHauteur + "," + addLargeur + ",'" + addNbHeure + "')";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
-            dt = ds.Tables[0];
             conn.Close();
+            select_All();
         }
         catch (Exception msg)
         {
@@ -101,8 +101,8 @@ public partial class Account_Attachments : System.Web.UI.Page
             string sql = "Delete FROM attachement Where id_attachement = " + Convert.ToInt32(AttachmentGridView.DataKeys[e.RowIndex].Value.ToString()) + "";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
-            dt = ds.Tables[0];
             conn.Close();
+            select_All();
         }
         catch (Exception msg)
         {

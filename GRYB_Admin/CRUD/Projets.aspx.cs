@@ -65,7 +65,7 @@ public partial class Account_Projets : System.Web.UI.Page
                            EventArgs e)
     {
         //Get data from the form
-        string addName = Request.Form["addName"];
+        string addName = addNameText.Text;
         try
         {
             //Connect to the DB
@@ -75,8 +75,8 @@ public partial class Account_Projets : System.Web.UI.Page
             string sql = "Insert into projet (nom) Values('"+addName+"')";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
-            dt = ds.Tables[0];
             conn.Close();
+            select_All();
         }
         catch (Exception msg)
         {
@@ -95,7 +95,6 @@ public partial class Account_Projets : System.Web.UI.Page
             string sql = "Delete FROM projet Where id_projet = " + Convert.ToInt32(ProjectGridView.DataKeys[e.RowIndex].Value.ToString()) + "";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
-            dt = ds.Tables[0];
             conn.Close();
             select_All();
         }

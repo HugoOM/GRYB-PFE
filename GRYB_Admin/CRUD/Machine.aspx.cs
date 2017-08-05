@@ -64,15 +64,14 @@ public partial class Account_Machine : System.Web.UI.Page
                            EventArgs e)
     {
         //Get data from the form
-        string addName = Request.Form["addMarque"];
-        string addModele = Request.Form["addModele"];
-        string addMarque = Request.Form["addMarque"];
-        string addHauteur = Request.Form["addHauteur"];
-        string addLargeur = Request.Form["addLargeur"];
-        string addPoid = Request.Form["addPoid"];
-        string addCapacite = Request.Form["addCapacite"];
-        string addNbHeure = Request.Form["addNbHeure"];
-        string addCompatibilite = Request.Form["addCompatibilite"];
+        string addModele = addModeleText.Text;
+        string addMarque = addMarqueText.Text;
+        string addHauteur = addHauteurText.Text;
+        string addLargeur = addLargeurText.Text;
+        string addPoid = addPoidText.Text;
+        string addCapacite = addCapaciteText.Text;
+        string addNbHeure = addNbHeureText.Text;
+        string addCompatibilite = addCompatibiliteText.Text;
         try
         {
 
@@ -83,8 +82,8 @@ public partial class Account_Machine : System.Web.UI.Page
             string sql = "Insert into machine (marque,modele,hauteur,largeur,poids,capacite,nb_heure_entre_entretient,type_compatibilite) Values('" + addMarque + "','"+addModele+"',"+addHauteur+ "," + addLargeur + "," + addPoid + "," + addCapacite + "," + addNbHeure + ",'"+addCompatibilite+"')";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
-            dt = ds.Tables[0];
             conn.Close();
+            select_All();
         }
         catch (Exception msg)
         {
@@ -103,15 +102,14 @@ public partial class Account_Machine : System.Web.UI.Page
             string sql = "Delete FROM machine Where id_machine = " + Convert.ToInt32(MachineGridView.DataKeys[e.RowIndex].Value.ToString()) + "";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
-            dt = ds.Tables[0];
             conn.Close();
+            select_All();
         }
         catch (Exception msg)
         {
             //DB error are trown in a Label
             ErrorManagement.Text = "une erreur s'est produite : " + msg.ToString();
         }
-        select_All();
     }
     protected void GridView_RowUpdating(object sender, GridViewUpdateEventArgs e)
     {
