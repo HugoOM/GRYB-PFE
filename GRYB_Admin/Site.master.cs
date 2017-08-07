@@ -66,7 +66,8 @@ public partial class SiteMaster : MasterPage
 
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        appTitle.Text = Page.Title + " - " + Resources.General.GRYBApplication;
+        footerBrand.Text = "&copy;" + " " + DateTime.Now.Year + " - " + Resources.General.GRYBApplication;
     }
 
     protected void Unnamed_LoggingOut(object sender, LoginCancelEventArgs e)

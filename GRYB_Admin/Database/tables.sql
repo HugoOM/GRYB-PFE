@@ -14,7 +14,10 @@ DROP TABLE IF EXISTS projet_membre;
 DROP TABLE IF EXISTS projet;
 DROP TABLE IF EXISTS membre;
 DROP TABLE IF EXISTS client;
-
+DROP TABLE IF EXISTS utilisateur;
+DROP TABLE IF EXISTS role;
+DROP TABLE IF EXISTS permission;
+DROP TABLE IF EXISTS role_permission;
 
 CREATE TABLE client
 (
@@ -187,6 +190,40 @@ CREATE TABLE attachement_projet
     CONSTRAINT attachement_projet_id_attachement_instance_fk FOREIGN KEY (id_attachement_instance) REFERENCES attachement_instance(id_attachement_instance) ON DELETE CASCADE
 );
 
+CREATE TABLE permission
+(
+    id_permission SERIAL,
+    code VARCHAR NOT NULL,
+    nom_fr VARCHAR,
+	nom_en VARCHAR,
+    CONSTRAINT permission_pk PRIMARY KEY (id_permission)
+);
+
+CREATE TABLE role
+(
+    id_role SERIAL,
+    nom VARCHAR NOT NULL,
+    CONSTRAINT role_pk PRIMARY KEY (id_role)
+);
+
+CREATE TABLE role_permission
+(
+    id_role INTEGER NOT NULL,
+    id_permission INTEGER NOT NULL,
+    CONSTRAINT role_permission_pk PRIMARY KEY (id_role, id_permission)
+);
+
+
+CREATE TABLE utilisateur
+(
+    id_utilisateur SERIAL,
+    nom VARCHAR NOT NULL,
+    mot_de_passe VARCHAR NOT NULL,
+	id_role INTEGER NOT NULL,
+    CONSTRAINT utilisateur_pk PRIMARY KEY (id_utilisateur),
+    CONSTRAINT role_id_role_fk FOREIGN KEY (id_role) REFERENCES Role(id_role)
+);
+
 
 INSERT INTO client (adresse_principale, adresse_secondaire, telephone, nom_contact, courriel, site_web) VALUES ('123 adresse principale', ' 123 adresse secondaire', '5141234567', 'John Doe', 'john@doe.com', 'http://google.com');
 INSERT INTO client (adresse_principale, adresse_secondaire, telephone, nom_contact, courriel, site_web) VALUES ('456 adresse principale', ' 456 adresse secondaire', '5147654321', 'Jane Roe', 'jane@roe.com', 'http://google.com');
@@ -236,4 +273,17 @@ INSERT INTO attachement_photo (id_attachement, image_url) VALUES (2, 'http://via
 INSERT INTO attachement_projet (id_projet, id_attachement_instance) VALUES (1, 1);
 INSERT INTO attachement_projet (id_projet, id_attachement_instance) VALUES (2, 2);
 
+INSERT INTO role (nom) VALUES ('superAdmin');
+
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('addUser', 'ajouter utilisateurs', 'add users'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageUser', 'Gérer les utilisateurs', 'manage users'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('removeUser', 'supprimer les utilisateurs', 'remove users'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageRole', 'Gérer les roles', 'manage roles'); 
+
+INSERT INTO utilisateur (nom, mot_de_passe, id_role) VALUES ('admin', 'AHY5s+PQwNC13fpWm7OYAtkk2MYFx0pM9zgVyeMFnKkjofUy+xx5jUH96COQg2VhRw==', 1);
+
+INSERT into role_permission (id_role, id_permission) VALUES (1,1);
+INSERT into role_permission (id_role, id_permission) VALUES (1,2);
+INSERT into role_permission (id_role, id_permission) VALUES (1,3);
+INSERT into role_permission (id_role, id_permission) VALUES (1,4);
 COMMIT;

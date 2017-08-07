@@ -1,34 +1,9 @@
 ﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
+using System.Security.Claims;
 using System.Web;
 using System;
-using GRYB_Admin;
-
-namespace GRYB_Admin
-{
-    // You can add User data for the user by adding more properties to your User class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
-    public class ApplicationUser : IdentityUser
-    {
-    }
-
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-    {
-        public ApplicationDbContext()
-            : base("DefaultConnection")
-        {
-        }
-    }
-
-    #region Helpers
-    public class UserManager : UserManager<ApplicationUser>
-    {
-        public UserManager()
-            : base(new UserStore<ApplicationUser>(new ApplicationDbContext()))
-        {
-        }
-    }
-}
+using System.Collections.Generic;
 
 namespace GRYB_Admin
 {
@@ -37,12 +12,25 @@ namespace GRYB_Admin
         // Used for XSRF when linking external logins
         public const string XsrfKey = "XsrfId";
 
-        public static void SignIn(UserManager manager, ApplicationUser user, bool isPersistent)
+        public static void SignIn(IdentityManager manager, User user, bool isPersistent)
         {
             IAuthenticationManager authenticationManager = HttpContext.Current.GetOwinContext().Authentication;
             authenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-            var identity = manager.CreateIdentity(user, DefaultAuthenticationTypes.ApplicationCookie);
-            authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, identity);
+
+            var claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.Name, user.name, ClaimValueTypes.String, user.id));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.id));
+            List<Permission> permissions = user.role.permissions;
+            foreach (Permission p in permissions)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, p.code, ClaimValueTypes.String, p.id));
+            }
+            
+            var userIdentity = new ClaimsIdentity("ApplicationCookie");
+            
+            userIdentity.AddClaims(claims);
+            var userPrincipal = new ClaimsPrincipal(userIdentity);
+            authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, userIdentity);
         }
 
         public const string ProviderNameKey = "providerName";
@@ -73,5 +61,4 @@ namespace GRYB_Admin
             }
         }
     }
-    #endregion
 }
