@@ -1,6 +1,6 @@
 ﻿/* Move down content because we have a fixed navbar that is 50px tall */
 body {
-    padding-top: 50px;
+    padding-top: 68px;
     padding-bottom: 20px;
 }
 
@@ -34,7 +34,18 @@ textarea {
 }
 
 .navbar-brand > img {
-    height: 100%;
     padding: 15px;
-    width: auto;
+    max-width: 110px;
+}
+
+@media (min-width: 768px) {
+    .navbar-nav > li > a {
+        padding-top: 22px;
+        padding-bottom: 22px;
+    }
+}
+
+h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
