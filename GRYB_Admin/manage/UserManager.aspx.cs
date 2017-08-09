@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Mvc;
 using System.Web.UI.WebControls;
-using System.Web.Http;
 
 [Authorize(Roles = RolePermission.removeUser)]
 public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
@@ -38,22 +38,14 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
                 roleDDL.SelectedIndex = roleDDL.Items.IndexOf(roleDDL.Items.FindByValue(role.id));
             }
             userDiv.Visible = true;
+            passwordResetDiv.Visible = true;
         }
         else
         {
             userDiv.Visible = false;
+            passwordResetDiv.Visible = false;
         }
     }
-
-    protected void passwordResetLink_Click(object sender, EventArgs e)
-    {
-        
-        if (passwordResetDiv.Visible)
-            passwordResetDiv.Visible = false;
-        else
-            passwordResetDiv.Visible = true;
-    }
-
 
     protected void userDDList_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -62,13 +54,18 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
 
     private void hideAllActionMessages()
     {
-        passwordResetsuccess.Visible = false;
+        passwordResetSuccess.Visible = false;
+        passwordResetSuccessAlert.Visible = false;
         passwordResetError.Visible = false;
+        passwordResetErrorAlert.Visible = false;
         userDeletedSuccess.Visible = false;
+        userDeletedSuccessAlert.Visible = false;
         userDeletedError.Visible = false;
-        UserModificationSuccess.Visible = false;
-        UserModificationError.Visible = false;
-        
+        userDeletedErrorAlert.Visible = false;
+        userModificationSuccess.Visible = false;
+        userModificationSuccessAlert.Visible = false;
+        userModificationError.Visible = false;
+        userModificationErrorAlert.Visible = false;
     }
 
     [Authorize(Roles = RolePermission.manageUser)]
@@ -84,13 +81,14 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
       int result = manager.UpdateUser(user);
         if (result == 1)
         {
-            passwordResetsuccess.Visible = true;
-            
+            passwordResetSuccess.Visible = true;
+            passwordResetSuccessAlert.Visible = true;
         }
         else
         {
             passwordResetError.Text = Resources.General.AnErrorOccured_passwordNotChanged;
             passwordResetError.Visible = true;
+            passwordResetErrorAlert.Visible = true;
         }   
     }
     [Authorize(Roles = RolePermission.manageUser)]
@@ -106,12 +104,14 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
        int result = manager.UpdateUser(user);
         if (result == 1)
         {
-            UserModificationSuccess.Visible = true;
+            userModificationSuccess.Visible = true;
+            userModificationSuccessAlert.Visible = true;
         }
         else
         {
-            UserModificationError.Visible = true;
-            UserModificationError.Text = Resources.General.UserModificationFailed;
+            userModificationError.Visible = true;
+            userModificationErrorAlert.Visible = true;
+            userModificationError.Text = Resources.General.UserModificationFailed;
         } 
     }
 
@@ -127,6 +127,7 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
         if (user == null)
         {
             userDeletedError.Visible = true;
+            userDeletedErrorAlert.Visible = true;
             userDeletedError.Text = Resources.General.UserDeletionFailed_notFound;
             return;
         }
@@ -136,10 +137,12 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
         {
             refreshFields(null);
             userDeletedSuccess.Visible = true;// "User successfully deleted";
+            userDeletedSuccessAlert.Visible = true;
         }
         else
         {
             userDeletedError.Visible = true;
+            userDeletedErrorAlert.Visible = true;
             userDeletedError.Text = Resources.General.UserDeletionFailedPrefix;
         }
     }
