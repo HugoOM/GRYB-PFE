@@ -14,6 +14,7 @@ public partial class Account_Login : Page
 
         protected void LogIn(object sender, EventArgs e)
         {
+        // La page est valide
         if (IsValid)
             {
             IdentityManager manager = new IdentityManager();

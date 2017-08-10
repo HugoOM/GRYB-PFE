@@ -303,4 +303,133 @@
   <data name="PleaseSelectAUser" xml:space="preserve">
     <value>Sélectionnez un utilisateur</value>
   </data>
+  <data name="AddAnAttachment" xml:space="preserve">
+    <value>Ajouter un attachement</value>
+  </data>
+  <data name="AdminPanel" xml:space="preserve">
+    <value>Panneau administratif</value>
+  </data>
+  <data name="AnErrorHasOccured" xml:space="preserve">
+    <value>Une erreur est survenue</value>
+  </data>
+  <data name="AttachmentNumber" xml:space="preserve">
+    <value>Numéro d'attachement</value>
+  </data>
+  <data name="Attachments" xml:space="preserve">
+    <value>Attachements</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>Marque</value>
+  </data>
+  <data name="Compatibility" xml:space="preserve">
+    <value>Compatibilité</value>
+  </data>
+  <data name="CompatibilityType" xml:space="preserve">
+    <value>Type de compatibilité</value>
+  </data>
+  <data name="FromTheMenuAboveYouCanManageAllTheBasicInformations" xml:space="preserve">
+    <value>À partir du menu plus haut, vous pouvez gérer toutes les informations générales</value>
+  </data>
+  <data name="Height" xml:space="preserve">
+    <value>Hauteur</value>
+  </data>
+  <data name="Height_InMeters" xml:space="preserve">
+    <value>Hauteur (en mètres)</value>
+  </data>
+  <data name="Machine" xml:space="preserve">
+    <value>Machine</value>
+  </data>
+  <data name="Model" xml:space="preserve">
+    <value>Modèle</value>
+  </data>
+  <data name="ModelNumber" xml:space="preserve">
+    <value>Numéro modèle</value>
+  </data>
+  <data name="NumberOfHoursOfMaintenance" xml:space="preserve">
+    <value>Nombre d'heure d'entretien</value>
+  </data>
+  <data name="OperationFailed_UsernameAlreadyExist" xml:space="preserve">
+    <value>Opération échouée, un utilisateur avec ce nom existe déjà</value>
+  </data>
+  <data name="OperationFailed_usersWasNotAdded" xml:space="preserve">
+    <value>Opération échouée, l'utilisateur n'a pas été ajouté</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>Projet</value>
+  </data>
+  <data name="SerialNumber" xml:space="preserve">
+    <value>Numéro de série</value>
+  </data>
+  <data name="Width_InMeters" xml:space="preserve">
+    <value>Largeur (en mètres)</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="AddAMachine" xml:space="preserve">
+    <value>Ajouter une machine</value>
+  </data>
+  <data name="CanOnlyContainNumbers" xml:space="preserve">
+    <value>Ne peut contenir que des nombres</value>
+  </data>
+  <data name="Capacity" xml:space="preserve">
+    <value>Capacité</value>
+  </data>
+  <data name="Capacity_InKilograms" xml:space="preserve">
+    <value>Capacité (en Kilogrammes)</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="NoRecordFound" xml:space="preserve">
+    <value>Aucune donnée trouvée</value>
+  </data>
+  <data name="TheFieldAttachmentNumberCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Numéro d'attachement ne peut être vide</value>
+  </data>
+  <data name="TheFieldBrandCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Marque ne peut être vide</value>
+  </data>
+  <data name="TheFieldCapacityCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Capacité ne peut être vide</value>
+  </data>
+  <data name="TheFieldCompatibilityCannotBeEmpty" xml:space="preserve">
+    <value>Le champ compatibilité ne peut être vide</value>
+  </data>
+  <data name="TheFieldCompatibilityTypeCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Type de compatibilité ne peut être vide</value>
+  </data>
+  <data name="TheFieldHeightCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Hauteur ne peut être vide</value>
+  </data>
+  <data name="TheFieldModelCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Numéro de modèle ne peut être vide</value>
+  </data>
+  <data name="TheFieldNameCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Nom ne peut être vide</value>
+  </data>
+  <data name="TheFieldNumberOfHoursOfMaintenanceCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Nombre d'heures d'entretient ne peut être vide</value>
+  </data>
+  <data name="TheFieldSerialNumberCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Numéro de série ne peut être vide</value>
+  </data>
+  <data name="TheFieldWeightCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Poids ne peut être vide</value>
+  </data>
+  <data name="TheWidthFieldCannotBeEmpty" xml:space="preserve">
+    <value>Le champ Largeur ne peut être vide</value>
+  </data>
+  <data name="Weight" xml:space="preserve">
+    <value>Poids</value>
+  </data>
+  <data name="Weight_InKilograms" xml:space="preserve">
+    <value>Poids (en Kilogrammes)</value>
+  </data>
+  <data name="Width" xml:space="preserve">
+    <value>Poids</value>
+  </data>
 </root>

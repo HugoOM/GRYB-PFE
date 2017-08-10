@@ -8,7 +8,9 @@ using System.Linq;
 using System.Web;
 
 /// <summary>
-/// Summary description for IdentityManager
+/// Interface to the database for everything related to Identity. Manage CRUD on users and roles.
+/// You can pass a locale string if you want to received localized text from the DB. Otherwise, it use the default locale.
+/// To see the locales supported, see ApplicationUtilities.getSupportedLocale() to get a list of supported locales
 /// </summary>
 public class IdentityManager
 {
@@ -28,12 +30,16 @@ public class IdentityManager
         }
         
     }
-
+    /// <summary>
+    /// Create a new user. Fail if a user with that name already exist
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     public IdentityResult CreateUser(User user)
     {
         if (GetUser(user.name) != null)
         {
-            return new IdentityResult("a user with this name already exist");
+            return new IdentityResult(Resources.General.OperationFailed_UsernameAlreadyExist);
         }
         int nbAffectedColumns = 0;
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -46,7 +52,7 @@ public class IdentityManager
         command.Parameters.AddWithValue("p1", user.name);
         command.Parameters.AddWithValue("p2", user.passwordHash);
         command.Parameters.AddWithValue("p3", Convert.ToInt32(user.role.id));
-            nbAffectedColumns = command.ExecuteNonQuery();
+        nbAffectedColumns = command.ExecuteNonQuery();
             
         }
         finally
@@ -55,26 +61,15 @@ public class IdentityManager
         }
         if (nbAffectedColumns == 0)
         {
-            return new IdentityResult("Operation failed, the user was not added");
+            return new IdentityResult(Resources.General.OperationFailed_usersWasNotAdded);
         }
         return IdentityResult.Success; // rien = succès?
     }
-
-    // Avoid situations where the user is locked out of his own system because he forgot the superAdmin password
-   /* internal void CreateDefaultUserIfAbsent()
-    {
-        Role role = GetRole()
-        User user = GetUser("super admin");
-        if (GetUser("superAdmin") == null)
-        {
-            user = new User();
-            user.name = "super admin";
-            user.setPasswordHash("admin", false);
-            user.role = 
-            CreateUser()
-        }
-    }*/
-
+    /// <summary>
+    /// Remove a user from the database
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     public int DeleteUser(User user)
     {
 
@@ -82,15 +77,12 @@ public class IdentityManager
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
         NpgsqlCommand command = new NpgsqlCommand();
         try
-        {
-
-        
+        {    
         conn.Open();
         command.Connection = conn;
         command.CommandText = "Delete from Utilisateur where id_utilisateur  = @p1";
         command.Parameters.AddWithValue("p1", Convert.ToInt32(user.id));
         nbAffectedColumns = command.ExecuteNonQuery();
-        
         }
         finally
         {
@@ -98,7 +90,11 @@ public class IdentityManager
         }
         return nbAffectedColumns;
     }
-
+    /// <summary>
+    /// Get a user based on the username. Will also load the user roles and permissions
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
     public User GetUser(String username)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -131,7 +127,10 @@ public class IdentityManager
         return user;
        
     }
-
+    /// <summary>
+    /// Get a list of all users, each with their role and permissions
+    /// </summary>
+    /// <returns></returns>
     public List<User> GetUsers()
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -143,7 +142,6 @@ public class IdentityManager
             command.Connection = conn;
             command.CommandText = "Select id_utilisateur, nom, mot_de_passe, id_role from Utilisateur";
             NpgsqlDataReader reader = command.ExecuteReader();
-        
         
             while (reader.Read())
             {
@@ -163,7 +161,12 @@ public class IdentityManager
         return users;
 
     }
-
+    /// <summary>
+    /// Check if the user loging credentials are valid, return the user if they are and null otherwise.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="plainPassword">Password that is not hashed</param>
+    /// <returns></returns>
     public User Login(String name, String plainPassword)
     {
         User user = GetUser(name);
@@ -173,7 +176,6 @@ public class IdentityManager
         }
 
         PasswordHasher hasher = new PasswordHasher();
-        PasswordVerificationResult r = new PasswordVerificationResult();
         PasswordVerificationResult result = hasher.VerifyHashedPassword(user.passwordHash, plainPassword);
         if (result.Equals(PasswordVerificationResult.Success))
         {
@@ -190,12 +192,16 @@ public class IdentityManager
             // Failed
             return null;
         }
-        //TODO check if you want to return user or identityResult
     }
-
+    /// <summary>
+    /// If the user exist and the old password match the current password, it will change the current password for the new password.
+    /// </summary>
+    /// <param name="userName"></param>
+    /// <param name="oldPasswordPlain">Current password of the user</param>
+    /// <param name="newPasswordPlain">New password for the user</param>
+    /// <returns></returns>
     public IdentityResult ChangePassword(string userName, string oldPasswordPlain, string newPasswordPlain)
     {
-       // oldPasswordPlain = new PasswordHasher().HashPassword(oldPasswordPlain);
        string newPassword  = new PasswordHasher().HashPassword(newPasswordPlain);
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
         int nbAffectedColumns = 0;
@@ -232,7 +238,12 @@ public class IdentityManager
 
 
 
-    // Update the user only, and not the associated role and permissions
+
+    /// <summary>
+    /// Update the user in the database, including the role he is assigned to, but does not update the role in any way.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     public int UpdateUser(User user)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -256,7 +267,11 @@ public class IdentityManager
         }
         return nbAffectedColumns;
     }
-
+    /// <summary>
+    /// Create a new role and assign the permissions to it. Will fail if a role with the same name already exist
+    /// </summary>
+    /// <param name="role"></param>
+    /// <returns></returns>
     public IdentityResult CreateRole(Role role)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -295,7 +310,11 @@ public class IdentityManager
         }
         return IdentityResult.Success;
     }
-
+    /// <summary>
+    /// Delete a role and it's associations with permissions
+    /// </summary>
+    /// <param name="role"></param>
+    /// <returns></returns>
     public IdentityResult DeleteRole(Role role)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -322,7 +341,11 @@ public class IdentityManager
         
         return IdentityResult.Success;
     }
-
+    /// <summary>
+    /// Count the number of users that have the role passed as parameter
+    /// </summary>
+    /// <param name="role"></param>
+    /// <returns></returns>
     public int countUserWithRole(Role role)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -348,7 +371,11 @@ public class IdentityManager
         
 
     }
-
+    /// <summary>
+    /// Get the role and associated permissions based on the id of a role. Return null if it failed.
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <returns></returns>
     public Role GetRole(string roleId)
     {
         if (roleId == null)
@@ -380,12 +407,15 @@ public class IdentityManager
             conn.Close();
 
         }
-        //int nbAffectedColumns = command.ExecuteNonQuery();
 
         return role;
 
     }
-
+    /// <summary>
+    /// Get the role and associated permissions based on the name of a role. Return null if it failed.
+    /// </summary>
+    /// <param name="roleName"></param>
+    /// <returns></returns>
     public Role GetRoleByName(String roleName)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -415,12 +445,13 @@ public class IdentityManager
             conn.Close();
 
         }
-        //int nbAffectedColumns = command.ExecuteNonQuery();
-
         return role;
 
     }
-
+    /// <summary>
+    /// Get a list of all the roles and associated permissions
+    /// </summary>
+    /// <returns></returns>
     public List<Role> GetRoles()
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -452,7 +483,12 @@ public class IdentityManager
         return roles;
 
     }
-
+    /// <summary>
+    /// Add a permission to a role
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <param name="permissionId"></param>
+    /// <returns></returns>
     public int AddRolePermission(String roleId, String permissionId)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -460,8 +496,6 @@ public class IdentityManager
         int nbAffectedColumns = 0;
         try
         {
-
-        
         conn.Open();
         command.Connection = conn;
         command.CommandText = "Insert into Role_permission (id_role, id_permission) values (@p1, @p2)";
@@ -475,7 +509,11 @@ public class IdentityManager
         
         return nbAffectedColumns;
     }
-
+    /// <summary>
+    /// Delete all the permissions associated with a role
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <returns></returns>
     public int DeleteRolePermission(string roleId)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -496,7 +534,12 @@ public class IdentityManager
         
         return nbAffectedColumns;
     }
-
+    /// <summary>
+    /// Delete the permission associated to the role
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <param name="permissionId"></param>
+    /// <returns></returns>
     public int DeleteRolePermission(string roleId, string permissionId)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -518,7 +561,11 @@ public class IdentityManager
 
         return nbAffectedColumns;
     }
-
+    /// <summary>
+    /// Get the permissions associated with a role.
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <returns></returns>
     public List<Permission> GetPermissions(string roleId)
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -526,21 +573,6 @@ public class IdentityManager
        
         try
         {
-
-            /*  NpgsqlCommand command = new NpgsqlCommand();
-              conn.Open();
-              command.Connection = conn;
-              command.CommandText = "select perm.id_permission, perm.code, perm.nom_" + locale + " from role_permission rolePerm" +
-                     " join permission perm on rolePerm.id_permission = perm.id_permission" +
-                     " where rolePerm.id_role = @p1";
-              command.Parameters.AddWithValue("p1", Convert.ToInt32(roleId));
-              NpgsqlDataReader reader;*/
-            //  try
-            // {
-            //reader = command.ExecuteReader();
-            //  } catch(Exception e)
-            //  {
-            // Fall back on the default name
             NpgsqlCommand command = new NpgsqlCommand();
             conn.Open();
             command.Connection = conn;
@@ -550,7 +582,6 @@ public class IdentityManager
                 command.Parameters.AddWithValue("p1", Convert.ToInt32(roleId));
             NpgsqlDataReader reader = command.ExecuteReader();
 
-         //   }
             if (!reader.HasRows)
             {
                 return permissions;
@@ -558,6 +589,7 @@ public class IdentityManager
             while (reader.Read())
             {
                 Permission permission = new Permission();
+                // If no locale is set, use the default locale, otherwise try with the locale provided
                 if (String.IsNullOrEmpty(locale) || reader.GetOrdinal("nom_" + locale) == -1)
                 {
                     permission.localizedName = reader[reader.GetOrdinal("nom_" + defaultLocale)].ToString();
@@ -569,23 +601,20 @@ public class IdentityManager
                 
                 permission.id = reader[reader.GetOrdinal("id_permission")].ToString();
                 permission.code = reader[reader.GetOrdinal("code")].ToString();
-                // role.permissions = GetPermissions(role.id);
                 permissions.Add(permission);
             }
-            
-            
         }
         finally
         {
             conn.Close();
 
         }
-        //int nbAffectedColumns = command.ExecuteNonQuery();
-
         return permissions;
-
     }
-
+    /// <summary>
+    /// Get all the permissions
+    /// </summary>
+    /// <returns></returns>
     public List<Permission> GetPermissions()
     {
         NpgsqlConnection conn = new NpgsqlConnection(connstring);
@@ -599,7 +628,6 @@ public class IdentityManager
             command.CommandText = "select * from permission";
             NpgsqlDataReader reader = command.ExecuteReader();
 
-            //   }
             if (!reader.HasRows)
             {
                 return null;
@@ -628,7 +656,6 @@ public class IdentityManager
             conn.Close();
 
         }
-        //int nbAffectedColumns = command.ExecuteNonQuery();
 
         return permissions;
 
@@ -647,7 +674,7 @@ public class User
     {
         if (!isAlreadyHashed)
         {
-            password = new PasswordHasher().HashPassword(password);//FIXME will it work?
+            password = new PasswordHasher().HashPassword(password);
         }
         passwordHash = password;
     }

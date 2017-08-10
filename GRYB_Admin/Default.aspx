@@ -4,7 +4,7 @@
 
     <div class="jumbotron">
         <img src="image/gryblogo.png" />
-        <p class="lead">Admin Panel</p>
-        <p>From the menu above you can manage all the basic information.</p>
+        <p class="lead"><asp:Literal runat="server" Text="<%$Resources:general,AdminPanel %>"></asp:Literal></p>
+        <p><asp:Literal runat="server" Text="<%$Resources:general,FromTheMenuAboveYouCanManageAllTheBasicInformations %>"></asp:Literal></p>
     </div>
 </asp:Content>

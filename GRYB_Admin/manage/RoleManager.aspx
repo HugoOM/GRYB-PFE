@@ -12,7 +12,7 @@
         <asp:Button ID="removeRole" Text="<%$Resources:general,RemoveRole %>"  runat="server" OnClick="removeRole_Click"/>
         <asp:TextBox ID="addRoleBox" runat="server" ></asp:TextBox>
         <p><asp:Label ID="addRoleSuccess" CssClass="text-success" EnableViewState="false" runat="server" Text="<%$Resources:general,RoleAddedSuccessfully %>" Visible="false"></asp:Label></p>
-        <p><asp:Label ID="addRoleFailure" CssClass="text-danger" EnableViewState="false" runat="server" Visible="false"></asp:Label></p>
+        <p><asp:Label ID="errorMessage" CssClass="text-danger" EnableViewState="false" runat="server" Visible="false"></asp:Label></p>
     <div id="permissionDiv" runat="server" visible="false">
      
     <div class="form-group"></div> 

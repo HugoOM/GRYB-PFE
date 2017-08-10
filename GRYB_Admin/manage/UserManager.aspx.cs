@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
 
@@ -19,31 +20,41 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
 
     private void refreshFields(string userId)
     {
-        userDDList.Items.Clear();
-        IdentityManager manager = new IdentityManager();
-        User plzSelectItem = new User();
-        plzSelectItem.name = Resources.General.PleaseSelectAUser;
-        List<User> orderedUsers = manager.GetUsers().OrderBy(i => i.name).ToList();
-        orderedUsers.Insert(0, plzSelectItem);
-        ApplicationUtilities.updateListControl(userDDList, orderedUsers, "id", "name");
-        ApplicationUtilities.updateListControl(roleDDL, manager.GetRoles().OrderBy(i => i.name).ToList(), "id", "name");
+        try
+        {
+            userDDList.Items.Clear();
+            IdentityManager manager = new IdentityManager();
+            // Append a please select a user item at the beginning of the list
+            User plzSelectItem = new User();
+            plzSelectItem.name = Resources.General.PleaseSelectAUser;
+            List<User> orderedUsers = manager.GetUsers().OrderBy(i => i.name).ToList();
+            orderedUsers.Insert(0, plzSelectItem);
 
-        if (!String.IsNullOrEmpty(userId))
-        {
-            userDDList.SelectedIndex = userDDList.Items.IndexOf(userDDList.Items.FindByValue(userId));
-            userName.Text = userDDList.SelectedItem.Text;
-            Role role = manager.GetUser(userDDList.SelectedItem.Text).role;
-            if (role != null)
+            ApplicationUtilities.updateListControl(userDDList, orderedUsers, "id", "name");
+            ApplicationUtilities.updateListControl(roleDDL, manager.GetRoles().OrderBy(i => i.name).ToList(), "id", "name");
+
+            if (!String.IsNullOrEmpty(userId))
             {
-                roleDDL.SelectedIndex = roleDDL.Items.IndexOf(roleDDL.Items.FindByValue(role.id));
+                userDDList.SelectedIndex = userDDList.Items.IndexOf(userDDList.Items.FindByValue(userId));
+                userName.Text = userDDList.SelectedItem.Text;
+                Role role = manager.GetUser(userDDList.SelectedItem.Text).role;
+                if (role != null)
+                {
+                    roleDDL.SelectedIndex = roleDDL.Items.IndexOf(roleDDL.Items.FindByValue(role.id));
+                }
+                userDiv.Visible = true;
+                passwordResetDiv.Visible = true;
             }
-            userDiv.Visible = true;
-            passwordResetDiv.Visible = true;
-        }
-        else
+            else
+            {
+                userDiv.Visible = false;
+                passwordResetDiv.Visible = false;
+            }
+        }catch (Exception ex)
         {
-            userDiv.Visible = false;
-            passwordResetDiv.Visible = false;
+            userModificationError.Visible = true;
+            userModificationErrorAlert.Visible = true;
+            userModificationError.Text = Resources.General.AnErrorHasOccured + ex.ToString();
         }
     }
 
@@ -71,79 +82,115 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
     [Authorize(Roles = RolePermission.manageUser)]
     protected void changePasswordButton_Click(object sender, EventArgs e)
     {
-        if (String.IsNullOrEmpty(userDDList.SelectedValue))
+        try
         {
-            return;
+
+
+            // For the cases where we have no user selected
+            if (String.IsNullOrEmpty(userDDList.SelectedValue))
+            {
+                return;
+            }
+            IdentityManager manager = new IdentityManager();
+            User user = manager.GetUser(userDDList.SelectedItem.Text);
+            user.setPasswordHash(Password.Text, false);
+            int result = manager.UpdateUser(user);
+            // result is the number of line modified, 1 mean it modified the line we wanted
+            if (result == 1)
+            {
+                passwordResetSuccess.Visible = true;
+                passwordResetSuccessAlert.Visible = true;
+            }
+            else
+            {
+                passwordResetError.Text = Resources.General.AnErrorOccured_passwordNotChanged;
+                passwordResetError.Visible = true;
+                passwordResetErrorAlert.Visible = true;
+            }
+        }catch (Exception ex)
+        {
+            userModificationError.Visible = true;
+            userModificationErrorAlert.Visible = true;
+            userModificationError.Text = Resources.General.AnErrorHasOccured + ex.ToString();
         }
-        IdentityManager manager = new IdentityManager();
-        User user = manager.GetUser(userDDList.SelectedItem.Text);
-        user.setPasswordHash(Password.Text, false);
-      int result = manager.UpdateUser(user);
-        if (result == 1)
-        {
-            passwordResetSuccess.Visible = true;
-            passwordResetSuccessAlert.Visible = true;
-        }
-        else
-        {
-            passwordResetError.Text = Resources.General.AnErrorOccured_passwordNotChanged;
-            passwordResetError.Visible = true;
-            passwordResetErrorAlert.Visible = true;
-        }   
     }
     [Authorize(Roles = RolePermission.manageUser)]
     protected void btnSave_Click(object sender, EventArgs e)
     {
-        if (String.IsNullOrEmpty(userDDList.SelectedValue))
+        try
         {
-            return;
-        }
-        IdentityManager manager = new IdentityManager();
-        User user = manager.GetUser(userDDList.SelectedItem.Text);
-        user.role = manager.GetRole(roleDDL.SelectedValue);
-       int result = manager.UpdateUser(user);
-        if (result == 1)
-        {
-            userModificationSuccess.Visible = true;
-            userModificationSuccessAlert.Visible = true;
-        }
-        else
+
+
+            // For the cases where we have no user selected
+            if (String.IsNullOrEmpty(userDDList.SelectedValue))
+            {
+                return;
+            }
+            IdentityManager manager = new IdentityManager();
+            User user = manager.GetUser(userDDList.SelectedItem.Text);
+            user.role = manager.GetRole(roleDDL.SelectedValue);
+            int result = manager.UpdateUser(user);
+            // result is the number of line modified, 1 mean it modified the line we wanted
+            if (result == 1)
+            {
+                userModificationSuccess.Visible = true;
+                userModificationSuccessAlert.Visible = true;
+            }
+            else
+            {
+                userModificationError.Visible = true;
+                userModificationErrorAlert.Visible = true;
+                userModificationError.Text = Resources.General.UserModificationFailed;
+            }
+        }catch (Exception ex)
         {
             userModificationError.Visible = true;
             userModificationErrorAlert.Visible = true;
-            userModificationError.Text = Resources.General.UserModificationFailed;
-        } 
+            userModificationError.Text = Resources.General.AnErrorHasOccured + ex.ToString();
+        }
     }
 
     [Authorize(Roles = RolePermission.removeUser)]
     protected void deleteUser_Click(object sender, EventArgs e)
     {
-        if (String.IsNullOrEmpty(userDDList.SelectedValue))
+        try
         {
-            return;
-        }
-        IdentityManager manager = new IdentityManager();
-        User user = manager.GetUser(userName.Text);
-        if (user == null)
-        {
-            userDeletedError.Visible = true;
-            userDeletedErrorAlert.Visible = true;
-            userDeletedError.Text = Resources.General.UserDeletionFailed_notFound;
-            return;
-        }
 
-        int result = manager.DeleteUser(user);
-        if (result == 1)
+
+            // For the cases where we have no user selected
+            if (String.IsNullOrEmpty(userDDList.SelectedValue))
+            {
+                return;
+            }
+            IdentityManager manager = new IdentityManager();
+            User user = manager.GetUser(userName.Text);
+            if (user == null)
+            {
+                userDeletedError.Visible = true;
+                userDeletedErrorAlert.Visible = true;
+                userDeletedError.Text = Resources.General.UserDeletionFailed_notFound;
+                return;
+            }
+
+            int result = manager.DeleteUser(user);
+            // result is the number of line modified, 1 mean it modified the line we wanted
+            if (result == 1)
+            {
+                refreshFields(null);
+                userDeletedSuccess.Visible = true;
+                userDeletedSuccessAlert.Visible = true;
+            }
+            else
+            {
+                userDeletedError.Visible = true;
+                userDeletedErrorAlert.Visible = true;
+                userDeletedError.Text = Resources.General.UserDeletionFailedPrefix;
+            }
+        } catch (Exception ex)
         {
-            refreshFields(null);
-            userDeletedSuccess.Visible = true;// "User successfully deleted";
-            userDeletedSuccessAlert.Visible = true;
-        }
-        else
-        {
-            userDeletedError.Visible = true;
-            userDeletedErrorAlert.Visible = true;
-            userDeletedError.Text = Resources.General.UserDeletionFailedPrefix;
+            userModificationError.Visible = true;
+            userModificationErrorAlert.Visible = true;
+            userModificationError.Text = Resources.General.AnErrorHasOccured + ex.ToString();
         }
     }
 }

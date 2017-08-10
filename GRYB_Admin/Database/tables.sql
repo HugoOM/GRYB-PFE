@@ -275,10 +275,12 @@ INSERT INTO attachement_projet (id_projet, id_attachement_instance) VALUES (2, 2
 
 INSERT INTO role (nom) VALUES ('superAdmin');
 
-INSERT INTO permission (code, nom_fr, nom_en) VALUES ('addUser', 'ajouter utilisateurs', 'add users'); 
-INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageUser', 'Gérer les utilisateurs', 'manage users'); 
-INSERT INTO permission (code, nom_fr, nom_en) VALUES ('removeUser', 'supprimer les utilisateurs', 'remove users'); 
-INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageRole', 'Gérer les roles', 'manage roles'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('addUser', 'Ajouter utilisateurs', 'Add users'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageUser', 'Gérer les utilisateurs', 'Manage users'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageAttachment', 'Gérer les attachements', 'Manage attachments'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageMachine', 'Gérer les machines', 'Manage machines'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageProject', 'Gérer les projets', 'Manage projects'); 
+INSERT INTO permission (code, nom_fr, nom_en) VALUES ('manageRole', 'Gérer les roles', 'Manage roles'); 
 
 INSERT INTO utilisateur (nom, mot_de_passe, id_role) VALUES ('admin', 'AHY5s+PQwNC13fpWm7OYAtkk2MYFx0pM9zgVyeMFnKkjofUy+xx5jUH96COQg2VhRw==', 1);
 
@@ -286,4 +288,6 @@ INSERT into role_permission (id_role, id_permission) VALUES (1,1);
 INSERT into role_permission (id_role, id_permission) VALUES (1,2);
 INSERT into role_permission (id_role, id_permission) VALUES (1,3);
 INSERT into role_permission (id_role, id_permission) VALUES (1,4);
+INSERT into role_permission (id_role, id_permission) VALUES (1,5);
+INSERT into role_permission (id_role, id_permission) VALUES (1,6);
 COMMIT;
