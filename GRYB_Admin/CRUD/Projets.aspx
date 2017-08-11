@@ -30,7 +30,7 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <h2>Ajouter un projet</h2>
+            <h2><asp:Literal runat="server" Text="<%$Resources:general,AddAProject %>"></asp:Literal></h2>
             <div class="form form-horizontal">
                 <div class="form-group">
                     <label for="addNameText" class="col-sm-1 control-label"><asp:Literal runat="server" Text="<%$Resources:general,Name %>"></asp:Literal></label>
