@@ -21,7 +21,7 @@
                     <asp:Label ID="addRoleSuccess" CssClass="text-success" EnableViewState="false" runat="server" Text="<%$Resources:general,RoleAddedSuccessfully %>" Visible="false"></asp:Label>
                 </p>
                 <p>
-                    <asp:Label ID="addRoleFailure" CssClass="text-danger" EnableViewState="false" runat="server" Visible="false"></asp:Label>
+                    <asp:Label ID="errorMessage" CssClass="text-danger" EnableViewState="false" runat="server" Visible="false"></asp:Label>
                 </p>
             </div>
         </div>

@@ -29,16 +29,26 @@ public partial class MemberPages_UserAndRoleManager : System.Web.UI.Page
         User user = new User();
         user.name = UserName.Text;
         user.setPasswordHash(Password.Text, false);
-        user.role = manager.GetRole(roleDDL.SelectedValue);
-        IdentityResult result  = manager.CreateUser(user);
-        if (!result.Succeeded)
+        try
         {
-            SuccessMessage.Text = "";
-            ErrorMessage.Text = result.Errors.FirstOrDefault();
-            return;
+
+
+            user.role = manager.GetRole(roleDDL.SelectedValue);
+            IdentityResult result = manager.CreateUser(user);
+            if (!result.Succeeded)
+            {
+                SuccessMessage.Text = "";
+                ErrorMessage.Text = result.Errors.FirstOrDefault();
+                return;
+            }
+
+            ErrorMessage.Text = "";
+            SuccessMessage.Text = Resources.General.UserAddedSuccessfully;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage.Text = Resources.General.AnErrorHasOccured + ": " +  ex.ToString();
         }
 
-        ErrorMessage.Text = "";
-        SuccessMessage.Text = "User added successfully";
     }
 }

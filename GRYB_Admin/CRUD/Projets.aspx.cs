@@ -7,14 +7,12 @@ using System.Web.UI.WebControls;
 using Npgsql;
 using System.Data;
 using System.Drawing;
+using System.Configuration;
 
 public partial class Account_Projets : System.Web.UI.Page
 {
     //Connection string to the database
-    private string connstring = String.Format("Server={0};Port={1};" +
-    "User Id={2};Password={3};Database={4}; SSL Mode={5};Trust Server Certificate={6};",
-    "ec2-107-21-99-176.compute-1.amazonaws.com", "5432", "hufmyrumplrijg",
-    "4ca6ce8f25630fbd310b32bcff802ec4e01e881797340a87c1cd74c771367874", "d99keabq5d8r02", "Require", "True");
+    private string connstring = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
     private DataSet ds = new DataSet();
     private DataTable dt = new DataTable();
     protected void Page_Load(object sender, EventArgs e)
@@ -51,13 +49,13 @@ public partial class Account_Projets : System.Web.UI.Page
                 ProjectGridView.Rows[0].Cells.Clear();
                 ProjectGridView.Rows[0].Cells.Add(new TableCell());
                 ProjectGridView.Rows[0].Cells[0].ColumnSpan = columncount;
-                ProjectGridView.Rows[0].Cells[0].Text = "No Records Found";
+                ProjectGridView.Rows[0].Cells[0].Text = Resources.General.NoRecordFound;
             }
         }
         catch (Exception msg)
         {
             //DB error are trown in a Label
-            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
+            ErrorManagement.Text = Resources.General.AnErrorHasOccured +  ": " + msg.ToString();
         }
     }
     
@@ -81,7 +79,7 @@ public partial class Account_Projets : System.Web.UI.Page
         catch (Exception msg)
         {
             //DB error are trown in a Label
-            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
+            ErrorManagement.Text = Resources.General.AnErrorHasOccured + ": " + msg.ToString();
         }
     }
     protected void GridView_RowDeleting(object sender, GridViewDeleteEventArgs e)
@@ -101,7 +99,7 @@ public partial class Account_Projets : System.Web.UI.Page
         catch (Exception msg)
         {
             //DB error are trown in a Label
-            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
+            ErrorManagement.Text = Resources.General.AnErrorHasOccured + ": " + msg.ToString();
         }
         
     }
@@ -128,7 +126,7 @@ public partial class Account_Projets : System.Web.UI.Page
         catch (Exception msg)
         {
             //DB error are trown in a Label
-            ErrorManagement.Text = "Une erreur s'est produite : " + msg.ToString();
+            ErrorManagement.Text = Resources.General.AnErrorHasOccured + ": " + msg.ToString();
         }
     }
     //The commands that are in charge of the transition in the grid view

@@ -11,12 +11,19 @@ namespace GRYB_Admin
     {
         // Used for XSRF when linking external logins
         public const string XsrfKey = "XsrfId";
-
+        /// <summary>
+        /// Sign in the user to the application
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="user"></param>
+        /// <param name="isPersistent"></param>
         public static void SignIn(IdentityManager manager, User user, bool isPersistent)
         {
+            // Remove the previous logged in user
             IAuthenticationManager authenticationManager = HttpContext.Current.GetOwinContext().Authentication;
             authenticationManager.SignOut(DefaultAuthenticationTypes.ExternalCookie);
 
+            // Create the claims (name, permissions,...) that will represent the user
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Name, user.name, ClaimValueTypes.String, user.id));
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.id));
@@ -27,7 +34,6 @@ namespace GRYB_Admin
             }
             
             var userIdentity = new ClaimsIdentity("ApplicationCookie");
-            
             userIdentity.AddClaims(claims);
             var userPrincipal = new ClaimsPrincipal(userIdentity);
             authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = isPersistent }, userIdentity);

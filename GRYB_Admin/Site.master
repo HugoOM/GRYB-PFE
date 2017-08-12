@@ -52,9 +52,9 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a runat="server" href="~/CRUD/Attachments">Attachements</a></li>
-                        <li><a runat="server" href="~/CRUD/Machine">Machine</a></li>
-                        <li><a runat="server" href="~/CRUD/Projets">Projet</a></li>
+                        <li><a runat="server" href="~/CRUD/Attachments"><asp:Literal runat="server" Text="<%$Resources:general,Attachments %>"></asp:Literal></a></li>
+                        <li><a runat="server" href="~/CRUD/Machine"><asp:Literal runat="server" Text="<%$Resources:general,Machine %>"></asp:Literal></a></li>
+                        <li><a runat="server" href="~/CRUD/Projets"><asp:Literal runat="server" Text="<%$Resources:general,Project %>"></asp:Literal></a></li>
                         <li><a runat="server" href="~/manage/RoleManager.aspx"><asp:Literal runat="server" Text="<%$Resources:general,ManageRoles %>"></asp:Literal></a></li>
                         <li><a runat="server" href="~/manage/UserManager.aspx"><asp:Literal runat="server" Text="<%$Resources:general,ManageUsers %>"></asp:Literal></a></li>
                         <li><a runat="server" href="~/manage/AddUser.aspx"><asp:Literal runat="server" Text="<%$Resources:general,AddUsers %>"></asp:Literal></a></li>
