@@ -76,7 +76,7 @@ public partial class Account_Attachments : System.Web.UI.Page
             NpgsqlConnection conn = new NpgsqlConnection(connstring);
             conn.Open();
             //The Insert SQL command to execute
-            string sql = "Insert into attachement (numero_attachement,numero_serie,type_compatibilite,marque,modele,hauteur,largeur,nb_heure_entre_entretient) Values('" + addNumAttachement + "','" + addNumSerie + "'," + addCompatibilite + "," + addMarque + "," + addModele + "," + addHauteur + "," + addLargeur + ",'" + addNbHeure + "')";
+            string sql = "Insert into attachement (numero_attachement,numero_serie,type_compatibilite,marque,modele,hauteur,largeur,nb_heure_entre_entretient) Values('" + addNumAttachement + "','" + addNumSerie + "','" + addCompatibilite + "','" + addMarque + "','" + addModele + "','" + addHauteur + "','" + addLargeur + "','" + addNbHeure + "')";
             NpgsqlDataAdapter da = new NpgsqlDataAdapter(sql, conn);
             da.Fill(ds);
             conn.Close();
